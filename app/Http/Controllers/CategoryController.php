@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CategoryController extends Controller
 {
@@ -14,7 +15,8 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $category = Category::with('post')->get();
+        return $category;
     }
 
     /**
@@ -35,7 +37,15 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|unique:categories,name',
+        ]);
+        $category = new Category;
+        $category->name = $request->name;
+        $category->slug = Str::slug($request->name);
+        $category->status = $request->status;
+        $category->save();
+        return response()->json(200);
     }
 
     /**

@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,6 +14,9 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
+// Route::get('/{any?}',function(){
+//     return view('welcome');
+// })->where('any', '[\/\w\.-]*');
 
 Route::get('/', function () {
     return view('welcome');
@@ -19,4 +24,7 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/{anypath?}', 'HomeController@index')->name('home')->where('path', '.*');
+// Route::get('/posts', 'PostController@index');
+// Route::get('/category', 'CategoryController@index');
+Route::resource('category', 'CategoryController');
