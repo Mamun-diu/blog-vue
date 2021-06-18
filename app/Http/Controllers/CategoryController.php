@@ -16,7 +16,7 @@ class CategoryController extends Controller
     public function index()
     {
         $category = Category::with('post')->get();
-        return $category;
+        return response()->json($category);
     }
 
     /**
@@ -65,9 +65,10 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function edit(Category $category)
+    public function edit($id)
     {
-        //
+        $category = Category::find($id);
+        return response()->json($category);
     }
 
     /**
@@ -77,9 +78,17 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Category $category)
+    public function update(Request $request, $id)
     {
-        //
+        $this->validate($request, [
+            'name' => 'required|unique:categories,name,'.$id,
+        ]);
+        $category = Category::find($id);
+        $category->name = $request->name;
+        $category->slug = Str::slug($request->name);
+        $category->status = $request->status;
+        $category->save();
+        return response()->json(200);
     }
 
     /**
@@ -88,8 +97,10 @@ class CategoryController extends Controller
      * @param  \App\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Category $category)
+    public function destroy($id)
     {
-        //
+        $category = Category::where('id',$id)->first();
+        $category->delete();
+        return response()->json(200);
     }
 }

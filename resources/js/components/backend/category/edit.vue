@@ -7,13 +7,13 @@
                     <div class="col-md-8 offset-md-2">
                         <div class="card card-info">
                             <div class="card-header ">
-                                <h3 class="card-title ">Add new category</h3>
+                                <h3 class="card-title ">Update category</h3>
                                 <router-link to="/categories" class="btn btn-sm btn-dark float-right">Back</router-link>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">
 
-                                    <form @submit.prevent="create" class="form-horizontal">
+                                    <form @submit.prevent="update" class="form-horizontal">
                                         <div class="card-body">
                                             <div class="form-group row">
                                                 <label for="name" class="col-sm-3 col-form-label">Category name</label>
@@ -41,7 +41,7 @@
                                         </div>
                                         <!-- /.card-body -->
                                         <div class="card-footer">
-                                            <button type="submit" class="btn btn-primary">Create</button>
+                                            <button type="submit" class="btn btn-primary">Update</button>
                                             <button @click="clearForm" type="reset" class="btn btn-default float-right">Cancel</button>
                                         </div>
                                         <!-- /.card-footer -->
@@ -62,24 +62,29 @@ import Form from 'vform'
     export default {
         data: () => ({
             form: new Form({
+            id: null,
             name: null,
             status: 1,
             })
         }),
 
         methods: {
-            async create () {
-            const response = await this.form.post('/api/category')
+            getCategory(){
+                let id = this.$route.params.id;
+                axios.get(`/api/category/${id}/edit `)
+                .then(res => {
+                    this.form.name = res.data.name;
+                    this.form.status = res.data.status;
+                    this.form.id = res.data.id;
+                })
+
+            },
+            async update () {
+            const response = await this.form.put(`/api/category/${this.form.id}`)
             if(response.status == 200){
-                // Swal.fire({
-                //     position: 'top-end',
-                //     icon: 'success',
-                //     title: 'Your data has been saved',
-                //     showConfirmButton: false,
-                //     timer: 1500
-                // })
-                toastr.success('Category created successfully');
+                toastr.success('Category updated successfully');
                 this.form.name = null;
+                this.$router.push('/categories');
 
             }
             },
@@ -87,6 +92,9 @@ import Form from 'vform'
                 this.form.name = null;
             },
 
+        },
+        mounted() {
+            this.getCategory();
         },
 
 

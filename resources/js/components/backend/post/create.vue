@@ -8,7 +8,7 @@
                         <div class="card card-info">
                             <div class="card-header ">
                                 <h3 class="card-title ">Add new category</h3>
-                                <router-link to="/categories" class="btn btn-sm btn-dark float-right">Back</router-link>
+                                <router-link :to="{name: 'posts'}" class="btn btn-sm btn-dark float-right">Back</router-link>
                             </div>
                             <!-- /.card-header -->
                             <div class="card-body p-0">

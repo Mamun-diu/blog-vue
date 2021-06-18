@@ -90,6 +90,12 @@
                                 <p>Categories</p>
                             </router-link>
                         </li>
+                        <li class="nav-item">
+                            <router-link to="/posts" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>Posts</p>
+                            </router-link>
+                        </li>
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
@@ -100,7 +106,7 @@
         <!-- Content Wrapper. Contains page content -->
         <div class="content-wrapper">
             <!-- Content Header (Page header) -->
-            
+
             <router-view></router-view>
             <!-- /.content -->
         </div>

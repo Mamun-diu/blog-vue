@@ -24,7 +24,9 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::get('/{anypath?}', 'HomeController@index')->name('home')->where('path', '.*');
+// Route::get('/{anypath?}', 'HomeController@index')->name('home')->where('path', '.*');
+Route::get('/{any?}', 'HomeController@index')->where('path', '.*');
+Route::get('/edit-category/{any?}', 'HomeController@index')->where('path', '.*');
+Route::get('/home', 'HomeController@index')->name('home');
 // Route::get('/posts', 'PostController@index');
 // Route::get('/category', 'CategoryController@index');
-Route::resource('category', 'CategoryController');
