@@ -2276,6 +2276,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "manage",
   data: function data() {
@@ -2286,8 +2288,21 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     };
   },
   methods: {
-    removeCategory: function removeCategory(id) {
+    checkSelect: function checkSelect() {
       var _this = this;
+
+      setTimeout(function () {
+        // console.log(this.categoryIds.length);
+        // console.log(this.getCategories.length);
+        if (_this.categoryIds.length == _this.getCategories.length) {
+          _this.checkValue = true;
+        } else {
+          _this.checkValue = false;
+        }
+      }, 1);
+    },
+    removeCategory: function removeCategory(id) {
+      var _this2 = this;
 
       Swal.fire({
         title: 'Are you sure?',
@@ -2300,7 +2315,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       }).then(function (result) {
         if (result.isConfirmed) {
           axios["delete"]("/api/category/".concat(id)).then(function () {
-            _this.$store.dispatch("receivedCategory");
+            _this2.$store.dispatch("receivedCategory");
 
             toastr.success('Category deleted successfully');
           });
@@ -2308,18 +2323,20 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       });
     },
     check: function check() {
-      var _this2 = this;
+      var _this3 = this;
 
       setTimeout(function () {
-        if (_this2.checkValue == true) {
-          var _iterator = _createForOfIteratorHelper(_this2.getCategories),
+        if (_this3.checkValue == true) {
+          _this3.categoryIds = [];
+
+          var _iterator = _createForOfIteratorHelper(_this3.getCategories),
               _step;
 
           try {
             for (_iterator.s(); !(_step = _iterator.n()).done;) {
               var cat = _step.value;
 
-              _this2.categoryIds.push(cat.id);
+              _this3.categoryIds.push(cat.id);
             }
           } catch (err) {
             _iterator.e(err);
@@ -2327,14 +2344,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
             _iterator.f();
           }
         } else {
-          _this2.categoryIds = [];
+          _this3.categoryIds = [];
         }
       }, 2);
     },
-    deleteAll: function deleteAll() {
-      var _this3 = this;
+    changeAll: function changeAll() {
+      var _this4 = this;
 
-      if (this.select == "select") {
+      if (this.select == "selectDelete") {
         Swal.fire({
           title: 'Are you sure?',
           text: "You won't be able to revert this!",
@@ -2345,16 +2362,21 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           confirmButtonText: 'Yes, delete it!'
         }).then(function (result) {
           if (result.isConfirmed) {
-            var _iterator2 = _createForOfIteratorHelper(_this3.categoryIds),
+            var i = 0;
+
+            var _iterator2 = _createForOfIteratorHelper(_this4.categoryIds),
                 _step2;
 
             try {
               for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
                 var id = _step2.value;
+                i++;
                 axios["delete"]("/api/category/".concat(id)).then(function () {
-                  _this3.$store.dispatch("receivedCategory");
+                  _this4.$store.dispatch("receivedCategory");
 
-                  _this3.categoryIds = [];
+                  _this4.categoryIds = [];
+                  _this4.select = 'noSelect';
+                  _this4.checkValue = false;
                 });
               }
             } catch (err) {
@@ -2363,9 +2385,63 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
               _iterator2.f();
             }
 
-            toastr.success('Category deleted successfully');
+            toastr.success(i + ' item has been deleted');
           }
         });
+      } else if (this.select == "selectActive") {
+        var i = 0;
+
+        var _iterator3 = _createForOfIteratorHelper(this.categoryIds),
+            _step3;
+
+        try {
+          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+            var id = _step3.value;
+            i++;
+            axios.put("/api/category/active/".concat(id), {
+              name: 'Mamun'
+            }).then(function () {
+              _this4.$store.dispatch("receivedCategory");
+
+              _this4.categoryIds = [];
+              _this4.select = 'noSelect';
+              _this4.checkValue = false;
+            });
+          }
+        } catch (err) {
+          _iterator3.e(err);
+        } finally {
+          _iterator3.f();
+        }
+
+        toastr.success(i + ' item has been changed to Activate');
+      } else if (this.select == "selectInactive") {
+        var _i = 0;
+
+        var _iterator4 = _createForOfIteratorHelper(this.categoryIds),
+            _step4;
+
+        try {
+          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+            var _id = _step4.value;
+            _i++;
+            axios.put("/api/category/inactive/".concat(_id), {
+              name: 'Mamun'
+            }).then(function () {
+              _this4.$store.dispatch("receivedCategory");
+
+              _this4.categoryIds = [];
+              _this4.select = 'noSelect';
+              _this4.checkValue = false;
+            });
+          }
+        } catch (err) {
+          _iterator4.e(err);
+        } finally {
+          _iterator4.f();
+        }
+
+        toastr.success(_i + ' item has been changed to Inactivate');
       }
     },
     time: function time(t) {
@@ -64983,7 +65059,7 @@ var render = function() {
                     _vm._v("Categories")
                   ]),
                   _vm._v(" "),
-                  _vm.categoryIds.length > 1
+                  _vm.categoryIds.length > 0
                     ? _c(
                         "select",
                         {
@@ -64995,7 +65071,7 @@ var render = function() {
                               expression: "select"
                             }
                           ],
-                          staticClass: "ml-3 select-option",
+                          staticClass: "ml-3 w-25 d-inline-block form-control",
                           on: {
                             change: [
                               function($event) {
@@ -65011,7 +65087,7 @@ var render = function() {
                                   ? $$selectedVal
                                   : $$selectedVal[0]
                               },
-                              _vm.deleteAll
+                              _vm.changeAll
                             ]
                           }
                         },
@@ -65020,7 +65096,15 @@ var render = function() {
                             _vm._v("--select--")
                           ]),
                           _vm._v(" "),
-                          _c("option", { attrs: { value: "select" } }, [
+                          _c("option", { attrs: { value: "selectActive" } }, [
+                            _vm._v("Active")
+                          ]),
+                          _vm._v(" "),
+                          _c("option", { attrs: { value: "selectInactive" } }, [
+                            _vm._v("Inactive")
+                          ]),
+                          _vm._v(" "),
+                          _c("option", { attrs: { value: "selectDelete" } }, [
                             _vm._v("delete all")
                           ])
                         ]
@@ -65053,10 +65137,10 @@ var render = function() {
                               expression: "checkValue"
                             }
                           ],
-                          attrs: { type: "checkbox", value: "false" },
+                          attrs: { type: "checkbox" },
                           domProps: {
                             checked: Array.isArray(_vm.checkValue)
-                              ? _vm._i(_vm.checkValue, "false") > -1
+                              ? _vm._i(_vm.checkValue, null) > -1
                               : _vm.checkValue
                           },
                           on: {
@@ -65066,7 +65150,7 @@ var render = function() {
                                 $$el = $event.target,
                                 $$c = $$el.checked ? true : false
                               if (Array.isArray($$a)) {
-                                var $$v = "false",
+                                var $$v = null,
                                   $$i = _vm._i($$a, $$v)
                                 if ($$el.checked) {
                                   $$i < 0 &&
@@ -65121,6 +65205,7 @@ var render = function() {
                                 : _vm.categoryIds
                             },
                             on: {
+                              click: _vm.checkSelect,
                               change: function($event) {
                                 var $$a = _vm.categoryIds,
                                   $$el = $event.target,

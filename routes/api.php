@@ -17,5 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+Route::put('/category/active/{id}', 'CategoryController@activeStatus');
+Route::put('/category/inactive/{id}', 'CategoryController@inactiveStatus');
 Route::resource('/category', 'CategoryController');
 Route::resource('/post', 'PostController');

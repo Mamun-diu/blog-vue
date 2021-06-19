@@ -8,9 +8,11 @@
                         <div class="card">
                             <div class="card-header ">
                                 <h3 class="card-title ">Categories</h3>
-                                <select @change="deleteAll" v-model="select" v-if="categoryIds.length>1" class="ml-3 select-option">
+                                <select @change="changeAll" v-model="select" v-if="categoryIds.length>0" class="ml-3 w-25 d-inline-block form-control">
                                     <option value="noSelect">--select--</option>
-                                    <option value="select">delete all</option>
+                                    <option value="selectActive">Active</option>
+                                    <option value="selectInactive">Inactive</option>
+                                    <option value="selectDelete">delete all</option>
                                 </select>
                                 <router-link to="/add-category" class="btn btn-sm btn-info float-right">Add Category</router-link>
                             </div>
@@ -20,7 +22,7 @@
                                     <thead>
                                         <tr>
                                             <th>
-                                                <input v-model="checkValue"   type="checkbox" value="false" @click="check">
+                                                <input v-model="checkValue"   type="checkbox"  @click="check">
                                             </th>
                                             <th>SL#</th>
                                             <th>Name</th>
@@ -32,7 +34,7 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(category,index) in getCategories" :key="index">
-                                            <td><input v-model="categoryIds" :value="category.id" type="checkbox"></td>
+                                            <td><input @click="checkSelect" v-model="categoryIds" :value="category.id" type="checkbox"></td>
                                             <td>{{ ++index }} </td>
                                             <td>{{ shortString(category.name) }} </td>
                                             <td>{{ shortString(category.slug) }} </td>
@@ -71,6 +73,19 @@ export default {
         }
     },
     methods: {
+        checkSelect(){
+            setTimeout(() => {
+                // console.log(this.categoryIds.length);
+                // console.log(this.getCategories.length);
+                if(this.categoryIds.length == this.getCategories.length){
+
+                    this.checkValue = true;
+                }else{
+
+                    this.checkValue = false;
+                }
+            }, 1);
+        },
         removeCategory(id){
             Swal.fire({
                 title: 'Are you sure?',
@@ -95,6 +110,7 @@ export default {
         check(){
             setTimeout(() => {
                 if(this.checkValue==true){
+                    this.categoryIds = [];
                     for (const cat of this.getCategories) {
                         this.categoryIds.push(cat.id);
 
@@ -105,8 +121,8 @@ export default {
             }, 2);
 
         },
-        deleteAll(){
-            if(this.select == "select"){
+        changeAll(){
+            if(this.select == "selectDelete"){
                 Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -117,19 +133,51 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                 if (result.isConfirmed) {
+                    let i = 0;
                     for (const id of this.categoryIds) {
+                        i++
                         axios.delete(`/api/category/${id}`)
                         .then(() =>{
                             this.$store.dispatch("receivedCategory");
                             this.categoryIds = []
+                            this.select= 'noSelect'
+                            this.checkValue = false;
                         })
                     }
-                    toastr.success('Category deleted successfully');
+                    toastr.success(i+' item has been deleted');
 
 
                 }
             })
 
+
+            }else if(this.select == "selectActive"){
+                let i = 0;
+                for (const id of this.categoryIds) {
+                    i++
+                    axios.put(`/api/category/active/${id}`,{name:'Mamun'})
+                    .then(() =>{
+                        this.$store.dispatch("receivedCategory");
+                        this.categoryIds = []
+                        this.select= 'noSelect'
+                        this.checkValue = false;
+                    })
+                }
+                toastr.success(i+' item has been changed to Activate');
+
+            }else if(this.select == "selectInactive"){
+                let i = 0;
+                for (const id of this.categoryIds) {
+                    i++
+                    axios.put(`/api/category/inactive/${id}`,{name:'Mamun'})
+                    .then(() =>{
+                        this.$store.dispatch("receivedCategory");
+                        this.categoryIds = []
+                        this.select= 'noSelect'
+                        this.checkValue = false;
+                    })
+                }
+                toastr.success(i+' item has been changed to Inactivate');
 
             }
         },

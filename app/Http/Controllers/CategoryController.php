@@ -103,4 +103,18 @@ class CategoryController extends Controller
         $category->delete();
         return response()->json(200);
     }
+    public function activeStatus($id){
+        $category = Category::findOrFail($id);
+        $category->status = "1";
+        $category->save();
+        return response()->json(200);
+
+    }
+    public function inactiveStatus($id){
+        $category = Category::findOrFail($id);
+        $category->status = "0";
+        $category->save();
+        return response()->json(200);
+
+    }
 }
