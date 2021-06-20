@@ -2292,8 +2292,6 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       var _this = this;
 
       setTimeout(function () {
-        // console.log(this.categoryIds.length);
-        // console.log(this.getCategories.length);
         if (_this.categoryIds.length == _this.getCategories.length) {
           _this.checkValue = true;
         } else {
@@ -2858,6 +2856,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 //
 //
 //
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "manage",
   data: function data() {
@@ -2868,8 +2868,19 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     };
   },
   methods: {
-    removePost: function removePost(id) {
+    checkSelect: function checkSelect() {
       var _this = this;
+
+      setTimeout(function () {
+        if (_this.postIds.length == _this.getPosts.length) {
+          _this.checkValue = true;
+        } else {
+          _this.checkValue = false;
+        }
+      }, 1);
+    },
+    removePost: function removePost(id) {
+      var _this2 = this;
 
       Swal.fire({
         title: 'Are you sure?',
@@ -2882,7 +2893,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       }).then(function (result) {
         if (result.isConfirmed) {
           axios["delete"]("/api/post/".concat(id)).then(function () {
-            _this.$store.dispatch("receivedPost");
+            _this2.$store.dispatch("receivedPost");
 
             toastr.success('Post deleted successfully');
           });
@@ -2890,18 +2901,20 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       });
     },
     check: function check() {
-      var _this2 = this;
+      var _this3 = this;
 
       setTimeout(function () {
-        if (_this2.checkValue == true) {
-          var _iterator = _createForOfIteratorHelper(_this2.getPosts),
+        if (_this3.checkValue == true) {
+          _this3.postIds = [];
+
+          var _iterator = _createForOfIteratorHelper(_this3.getPosts),
               _step;
 
           try {
             for (_iterator.s(); !(_step = _iterator.n()).done;) {
               var post = _step.value;
 
-              _this2.postIds.push(post.id);
+              _this3.postIds.push(post.id);
             }
           } catch (err) {
             _iterator.e(err);
@@ -2909,14 +2922,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
             _iterator.f();
           }
         } else {
-          _this2.postIds = [];
+          _this3.postIds = [];
         }
       }, 2);
     },
-    deleteAll: function deleteAll() {
-      var _this3 = this;
+    changeAll: function changeAll() {
+      var _this4 = this;
 
-      if (this.select == "select") {
+      if (this.select == "selectDelete") {
         Swal.fire({
           title: 'Are you sure?',
           text: "You won't be able to revert this!",
@@ -2927,16 +2940,18 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
           confirmButtonText: 'Yes, delete it!'
         }).then(function (result) {
           if (result.isConfirmed) {
-            var _iterator2 = _createForOfIteratorHelper(_this3.categoryIds),
+            var _iterator2 = _createForOfIteratorHelper(_this4.postIds),
                 _step2;
 
             try {
               for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
                 var id = _step2.value;
-                axios["delete"]("/api/category/".concat(id)).then(function () {
-                  _this3.$store.dispatch("receivedCategory");
+                axios["delete"]("/api/post/".concat(id)).then(function () {
+                  _this4.$store.dispatch("receivedPost");
 
-                  _this3.categoryIds = [];
+                  _this4.postIds = [];
+                  _this4.select = 'noSelect';
+                  _this4.checkValue = false;
                 });
               }
             } catch (err) {
@@ -2945,9 +2960,63 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
               _iterator2.f();
             }
 
-            toastr.success('Category deleted successfully');
+            toastr.success('Post deleted successfully');
           }
         });
+      } else if (this.select == "selectActive") {
+        var i = 0;
+
+        var _iterator3 = _createForOfIteratorHelper(this.postIds),
+            _step3;
+
+        try {
+          for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+            var id = _step3.value;
+            i++;
+            axios.put("/api/post/active/".concat(id), {
+              name: 'Mamun'
+            }).then(function () {
+              _this4.$store.dispatch("receivedPost");
+
+              _this4.postIds = [];
+              _this4.select = 'noSelect';
+              _this4.checkValue = false;
+            });
+          }
+        } catch (err) {
+          _iterator3.e(err);
+        } finally {
+          _iterator3.f();
+        }
+
+        toastr.success(i + ' item has been changed to Publish');
+      } else if (this.select == "selectInactive") {
+        var _i = 0;
+
+        var _iterator4 = _createForOfIteratorHelper(this.postIds),
+            _step4;
+
+        try {
+          for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+            var _id = _step4.value;
+            _i++;
+            axios.put("/api/post/inactive/".concat(_id), {
+              name: 'Mamun'
+            }).then(function () {
+              _this4.$store.dispatch("receivedPost");
+
+              _this4.postIds = [];
+              _this4.select = 'noSelect';
+              _this4.checkValue = false;
+            });
+          }
+        } catch (err) {
+          _iterator4.e(err);
+        } finally {
+          _iterator4.f();
+        }
+
+        toastr.success(_i + ' item has been changed to Draft');
       }
     },
     shortString: function shortString(s) {
@@ -65105,7 +65174,7 @@ var render = function() {
                           ]),
                           _vm._v(" "),
                           _c("option", { attrs: { value: "selectDelete" } }, [
-                            _vm._v("delete all")
+                            _vm._v("Delete")
                           ])
                         ]
                       )
@@ -65881,7 +65950,7 @@ var render = function() {
                     _vm._v("Manage Posts")
                   ]),
                   _vm._v(" "),
-                  _vm.postIds.length > 1
+                  _vm.postIds.length > 0
                     ? _c(
                         "select",
                         {
@@ -65893,7 +65962,7 @@ var render = function() {
                               expression: "select"
                             }
                           ],
-                          staticClass: "ml-3 select-option",
+                          staticClass: "ml-3 w-25 d-inline-block form-control",
                           on: {
                             change: [
                               function($event) {
@@ -65909,7 +65978,7 @@ var render = function() {
                                   ? $$selectedVal
                                   : $$selectedVal[0]
                               },
-                              _vm.deleteAll
+                              _vm.changeAll
                             ]
                           }
                         },
@@ -65918,8 +65987,16 @@ var render = function() {
                             _vm._v("--select--")
                           ]),
                           _vm._v(" "),
-                          _c("option", { attrs: { value: "select" } }, [
-                            _vm._v("delete all")
+                          _c("option", { attrs: { value: "selectActive" } }, [
+                            _vm._v("Publish")
+                          ]),
+                          _vm._v(" "),
+                          _c("option", { attrs: { value: "selectInactive" } }, [
+                            _vm._v("Draft")
+                          ]),
+                          _vm._v(" "),
+                          _c("option", { attrs: { value: "selectDelete" } }, [
+                            _vm._v("Delete")
                           ])
                         ]
                       )
@@ -66023,6 +66100,7 @@ var render = function() {
                                 : _vm.postIds
                             },
                             on: {
+                              click: _vm.checkSelect,
                               change: function($event) {
                                 var $$a = _vm.postIds,
                                   $$el = $event.target,

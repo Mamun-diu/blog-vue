@@ -20,4 +20,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::put('/category/active/{id}', 'CategoryController@activeStatus');
 Route::put('/category/inactive/{id}', 'CategoryController@inactiveStatus');
 Route::resource('/category', 'CategoryController');
+
+Route::put('/post/active/{id}', 'PostController@activeStatus');
+Route::put('/post/inactive/{id}', 'PostController@inactiveStatus');
 Route::resource('/post', 'PostController');

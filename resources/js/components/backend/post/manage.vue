@@ -8,9 +8,11 @@
                         <div class="card">
                             <div class="card-header ">
                                 <h3 class="card-title ">Manage Posts</h3>
-                                <select @change="deleteAll" v-model="select" v-if="postIds.length>1" class="ml-3 select-option">
+                                <select @change="changeAll" v-model="select" v-if="postIds.length>0" class="ml-3 w-25 d-inline-block form-control">
                                     <option value="noSelect">--select--</option>
-                                    <option value="select">delete all</option>
+                                    <option value="selectActive">Publish</option>
+                                    <option value="selectInactive">Draft</option>
+                                    <option value="selectDelete">Delete</option>
                                 </select>
                                 <router-link to="/add-post" class="btn btn-sm btn-info float-right">Add Post</router-link>
                             </div>
@@ -34,7 +36,7 @@
                                     </thead>
                                     <tbody>
                                         <tr v-for="(post,index) in getPosts" :key="index">
-                                            <td><input v-model="postIds" :value="post.id" type="checkbox"></td>
+                                            <td><input @click="checkSelect" v-model="postIds" :value="post.id" type="checkbox"></td>
                                             <td>{{ ++index }} </td>
                                             <td><img width="50" :src="post.thumbnail" alt="img"> </td>
                                             <td>{{ shortString(post.title) }} </td>
@@ -75,6 +77,17 @@ export default {
         }
     },
     methods: {
+        checkSelect(){
+            setTimeout(() => {
+                if(this.postIds.length == this.getPosts.length){
+
+                    this.checkValue = true;
+                }else{
+
+                    this.checkValue = false;
+                }
+            }, 1);
+        },
         removePost(id){
             Swal.fire({
                 title: 'Are you sure?',
@@ -99,6 +112,7 @@ export default {
         check(){
             setTimeout(() => {
                 if(this.checkValue==true){
+                    this.postIds = [];
                     for (const post of this.getPosts) {
                         this.postIds.push(post.id);
 
@@ -109,8 +123,8 @@ export default {
             }, 2);
 
         },
-        deleteAll(){
-            if(this.select == "select"){
+        changeAll(){
+            if(this.select == "selectDelete"){
                 Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -121,19 +135,45 @@ export default {
                 confirmButtonText: 'Yes, delete it!'
                 }).then((result) => {
                 if (result.isConfirmed) {
-                    for (const id of this.categoryIds) {
-                        axios.delete(`/api/category/${id}`)
+                    for (const id of this.postIds) {
+                        axios.delete(`/api/post/${id}`)
                         .then(() =>{
-                            this.$store.dispatch("receivedCategory");
-                            this.categoryIds = []
+                            this.$store.dispatch("receivedPost");
+                            this.postIds = []
+                            this.select= 'noSelect'
+                            this.checkValue = false;
                         })
                     }
-                    toastr.success('Category deleted successfully');
-
-
+                    toastr.success('Post deleted successfully');
                 }
             })
+            }else if(this.select == "selectActive"){
+                let i = 0;
+                for (const id of this.postIds) {
+                    i++
+                    axios.put(`/api/post/active/${id}`,{name:'Mamun'})
+                    .then(() =>{
+                        this.$store.dispatch("receivedPost");
+                        this.postIds = []
+                        this.select= 'noSelect'
+                        this.checkValue = false;
+                    })
+                }
+                toastr.success(i+' item has been changed to Publish');
 
+            }else if(this.select == "selectInactive"){
+                let i = 0;
+                for (const id of this.postIds) {
+                    i++
+                    axios.put(`/api/post/inactive/${id}`,{name:'Mamun'})
+                    .then(() =>{
+                        this.$store.dispatch("receivedPost");
+                        this.postIds = []
+                        this.select= 'noSelect'
+                        this.checkValue = false;
+                    })
+                }
+                toastr.success(i+' item has been changed to Draft');
 
             }
         },

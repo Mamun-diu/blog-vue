@@ -84,4 +84,19 @@ class PostController extends Controller
         Post::destroy($id);
         return response()->json(200);
     }
+
+    public function activeStatus($id){
+        $post = Post::findOrFail($id);
+        $post->status = "published";
+        $post->save();
+        return response()->json(200);
+
+    }
+    public function inactiveStatus($id){
+        $post = Post::findOrFail($id);
+        $post->status = "draft";
+        $post->save();
+        return response()->json(200);
+
+    }
 }

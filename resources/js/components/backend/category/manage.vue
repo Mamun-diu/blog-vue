@@ -12,7 +12,7 @@
                                     <option value="noSelect">--select--</option>
                                     <option value="selectActive">Active</option>
                                     <option value="selectInactive">Inactive</option>
-                                    <option value="selectDelete">delete all</option>
+                                    <option value="selectDelete">Delete</option>
                                 </select>
                                 <router-link to="/add-category" class="btn btn-sm btn-info float-right">Add Category</router-link>
                             </div>
@@ -75,8 +75,6 @@ export default {
     methods: {
         checkSelect(){
             setTimeout(() => {
-                // console.log(this.categoryIds.length);
-                // console.log(this.getCategories.length);
                 if(this.categoryIds.length == this.getCategories.length){
 
                     this.checkValue = true;
